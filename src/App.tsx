@@ -234,101 +234,109 @@ useEffect(() => {
     )}
 
     {user && (
-      <>
-        {/* NAVBAR */}
-        <div className="nav-root">
-          <div className="nav-left">
-            <span className="nav-logo">NOTEIFY</span>
-            <span className="nav-subtitle">Web V1 • ICS Styled</span>
-          </div>
+  <>
+    {/* NAVBAR */}
+    <div className="nav-root">
+      <div className="nav-left">
+        <span className="nav-logo">NOTEIFY</span>
+        <span className="nav-subtitle">Web V1 • ICS Styled</span>
+      </div>
 
-          <div className="nav-center">
-            <input
-              className="nav-search"
-              placeholder="Search notes..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </div>
+      <div className="nav-center">
+        <input
+          className="nav-search"
+          placeholder="Search notes..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+      </div>
 
-          <div className="nav-right">
-            <button
-              className="nav-link-btn"
-              onClick={() => {
-                setShowHome(true);
-                setShowStats(false);
-              }}
-            >
-              Home
-            </button>
-
-            <button
-              className="nav-link-btn"
-              onClick={() => {
-                setShowHome(false);
-                setShowStats(false);
-              }}
-            >
-              Notes
-            </button>
-
-            <button
-              className="nav-link-btn"
-              onClick={() => {
-                setShowHome(false);
-                setShowStats(true);
-              }}
-            >
-              Stats
-            </button>
-          </div>
-        </div>
-
-      {/* HOME PAGE */}
-      {showHome && !showStats && (
-        <div className="frame fade-in">
-          <h1 className="title">NOTEIFY V1</h1>
-          <p className="subtitle">A redesigned note‑taking experience</p>
-
-          <button onClick={() => setShowHome(false)}>📒 Open Noteify</button>
-          <button onClick={() => setShowStats(true)}>📊 View Stats</button>
-        </div>
-      )}
-
-      {/* MAIN APP */}
-      {!showHome && !showStats && (
-        <div
-          className="frame fade-in"
-          style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}
+      <div className="nav-right">
+        <button
+          className="nav-link-btn"
+          onClick={() => {
+            setShowHome(true);
+            setShowStats(false);
+          }}
         >
-          <div style={{ display: 'flex', gap: '20px' }}>
-            {/* FOLDER SIDEBAR */}
-            <div
-              style={{
-                width: '220px',
-                borderRight: '1px solid rgba(255,255,255,0.15)',
-                paddingRight: '15px',
-              }}
-            >
-              <h3 style={{ color: '#ffd700' }}>Folders</h3>
+          Home
+        </button>
 
-              {folders.map((f) => (
-                <button
-                  key={f.id}
-                  onClick={() => {
-                    setCurrentFolder(f.id);
-                    setRenamingFolder(false);
-                  }}
-                  style={{
-                    background:
-                      currentFolder === f.id
-                        ? 'rgba(255, 215, 0, 0.25)'
-                        : 'rgba(20,20,20,0.85)',
-                  }}
-                >
-                  {f.name}
-                </button>
-              ))}
+        <button
+          className="nav-link-btn"
+          onClick={() => {
+            setShowHome(false);
+            setShowStats(false);
+          }}
+        >
+          Notes
+        </button>
+
+        <button
+          className="nav-link-btn"
+          onClick={() => {
+            setShowHome(false);
+            setShowStats(true);
+          }}
+        >
+          Stats
+        </button>
+
+        <button
+          className="nav-link-btn"
+          onClick={() => auth.signOut()}
+          style={{ marginLeft: "10px", color: "#ff6b6b" }}
+        >
+          Log Out
+        </button>
+      </div>
+    </div>
+
+    {/* HOME PAGE */}
+    {showHome && !showStats && (
+      <div className="frame fade-in">
+        <h1 className="title">NOTEIFY V1</h1>
+        <p className="subtitle">A redesigned note‑taking experience</p>
+
+        <button onClick={() => setShowHome(false)}>📒 Open Noteify</button>
+        <button onClick={() => setShowStats(true)}>📊 View Stats</button>
+      </div>
+    )}
+
+    {/* MAIN APP */}
+    {!showHome && !showStats && (
+      <div
+        className="frame fade-in"
+        style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}
+      >
+        <div style={{ display: 'flex', gap: '20px' }}>
+          {/* FOLDER SIDEBAR */}
+          <div
+            style={{
+              width: '220px',
+              borderRight: '1px solid rgba(255,255,255,0.15)',
+              paddingRight: '15px',
+            }}
+          >
+            <h3 style={{ color: '#ffd700' }}>Folders</h3>
+
+            {folders.map((f) => (
+              <button
+                key={f.id}
+                onClick={() => {
+                  setCurrentFolder(f.id);
+                  setRenamingFolder(false);
+                }}
+                style={{
+                  background:
+                    currentFolder === f.id
+                      ? 'rgba(255, 215, 0, 0.25)'
+                      : 'rgba(20,20,20,0.85)',
+                }}
+              >
+                {f.name}
+              </button>
+            ))}
 
               {customFolders.map((name) => (
                 <button
