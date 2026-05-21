@@ -1,5 +1,19 @@
 import { useState, useEffect } from 'react';
 import './index.css';
+import { auth } from "./firebase";
+import { useAuthState } from "react-firebase-hooks/auth";
+import Login from "./Login";
+import { db } from "./firebase";
+import { 
+  collection, 
+  addDoc, 
+  updateDoc, 
+  deleteDoc, 
+  doc, 
+  getDocs, 
+  query, 
+  where 
+} from "firebase/firestore";
 
 interface Note {
   id: string;
@@ -14,6 +28,7 @@ interface Note {
 const SYSTEM_FOLDERS = ['all', 'personal', 'work', 'trash'];
 
 export default function App() {
+  const [user] = useAuthState(auth);
   const [showHome, setShowHome] = useState(true);
   const [showStats, setShowStats] = useState(false);
 
@@ -58,6 +73,28 @@ export default function App() {
     localStorage.setItem('noteify-folders', JSON.stringify(customFolders));
   }, [customFolders]);
 
+  // Load notes from Firestore when user logs in
+useEffect(() => {
+  if (!user) return;
+
+  async function loadNotes() {
+    const q = query(
+      collection(db, "notes"),
+      where("userId", "==", user.uid)
+    );
+
+    const snapshot = await getDocs(q);
+    const loaded = snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    })) as Note[];
+
+    setNotes(loaded);
+  }
+
+  loadNotes();
+}, [user]);
+
   const folders = [
     { id: 'all', name: 'All Notes' },
     { id: 'personal', name: 'Personal' },
@@ -79,9 +116,35 @@ export default function App() {
       .includes(searchQuery.toLowerCase())
   );
 
-  function createNote() {
-    const id = crypto.randomUUID();
-    const now = Date.now();
+  async function createNote() {
+  const id = crypto.randomUUID();
+  const now = Date.now();
+
+  const targetFolder =
+    currentFolder === 'all' || currentFolder === 'trash'
+      ? 'personal'
+      : currentFolder;
+
+  const newNote: Note = {
+    id,
+    title: 'Untitled Note',
+    content: '',
+    folder: targetFolder,
+    deleted: false,
+    createdAt: now,
+    updatedAt: now,
+  };
+
+  setNotes([newNote, ...notes]);
+  setSelectedNoteId(id);
+  setShowHome(false);
+
+  // Save to Firestore
+  await addDoc(collection(db, "notes"), {
+    ...newNote,
+    userId: user.uid
+  });
+}
 
     const targetFolder =
       currentFolder === 'all' || currentFolder === 'trash'
@@ -103,8 +166,21 @@ export default function App() {
     setShowHome(false);
   }
 
-  function updateNote(fields: Partial<Note>) {
-    if (!selectedNoteId) return;
+  async function updateNote(fields: Partial<Note>) {
+  if (!selectedNoteId) return;
+
+  setNotes((prev) =>
+    prev.map((n) =>
+      n.id === selectedNoteId ? { ...n, ...fields, updatedAt: Date.now() } : n
+    )
+  );
+
+  const noteRef = doc(db, "notes", selectedNoteId);
+  await updateDoc(noteRef, {
+    ...fields,
+    updatedAt: Date.now()
+  });
+}
 
     setNotes((prev) =>
       prev.map((n) =>
@@ -113,12 +189,14 @@ export default function App() {
     );
   }
 
-  function deleteNote(id: string) {
-    setNotes((prev) =>
-      prev.map((n) => (n.id === id ? { ...n, deleted: true } : n))
-    );
-    setSelectedNoteId(null);
-  }
+  async function deleteNote(id: string) {
+  setNotes((prev) =>
+    prev.map((n) => (n.id === id ? { ...n, deleted: true } : n))
+  );
+
+  const noteRef = doc(db, "notes", id);
+  await updateDoc(noteRef, { deleted: true });
+}
 
   function restoreNote(id: string) {
     setNotes((prev) =>
@@ -126,10 +204,12 @@ export default function App() {
     );
   }
 
-  function deleteForever(id: string) {
-    setNotes((prev) => prev.filter((n) => n.id !== id));
-    if (selectedNoteId === id) setSelectedNoteId(null);
-  }
+  async function deleteForever(id: string) {
+  setNotes((prev) => prev.filter((n) => n.id !== id));
+
+  const noteRef = doc(db, "notes", id);
+  await deleteDoc(noteRef);
+}
 
   function startRenameFolder() {
     if (SYSTEM_FOLDERS.includes(currentFolder)) return;
@@ -160,11 +240,14 @@ export default function App() {
     setRenamingFolder(false);
   }
 
-  function moveNoteToFolder(noteId: string, targetFolder: string) {
-    setNotes((prev) =>
-      prev.map((n) => (n.id === noteId ? { ...n, folder: targetFolder } : n))
-    );
-  }
+  async function moveNoteToFolder(noteId: string, targetFolder: string) {
+  setNotes((prev) =>
+    prev.map((n) => (n.id === noteId ? { ...n, folder: targetFolder } : n))
+  );
+
+  const noteRef = doc(db, "notes", noteId);
+  await updateDoc(noteRef, { folder: targetFolder });
+}
 
   const allFolderOptions = [
     ...folders.filter((f) => f.id !== 'trash'),
@@ -172,53 +255,64 @@ export default function App() {
   ];
 
   return (
-    <div className="app-root fade-in">
-      {/* NOTEIFY CUSTOM NAV (STYLE C) */}
-      <div className="nav-root">
-        <div className="nav-left">
-          <span className="nav-logo">NOTEIFY</span>
-          <span className="nav-subtitle">Web V1 • ICS Styled</span>
-        </div>
+  <div className="app-root fade-in">
 
-        <div className="nav-center">
-          <input
-            className="nav-search"
-            placeholder="Search notes..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-        </div>
-
-        <div className="nav-right">
-          <button
-            className="nav-link-btn"
-            onClick={() => {
-              setShowHome(true);
-              setShowStats(false);
-            }}
-          >
-            Home
-          </button>
-          <button
-            className="nav-link-btn"
-            onClick={() => {
-              setShowHome(false);
-              setShowStats(false);
-            }}
-          >
-            Notes
-          </button>
-          <button
-            className="nav-link-btn"
-            onClick={() => {
-              setShowHome(false);
-              setShowStats(true);
-            }}
-          >
-            Stats
-          </button>
-        </div>
+    {!user && (
+      <div style={{ padding: "40px" }}>
+        <Login />
       </div>
+    )}
+
+    {user && (
+      <>
+        {/* NAVBAR */}
+        <div className="nav-root">
+          <div className="nav-left">
+            <span className="nav-logo">NOTEIFY</span>
+            <span className="nav-subtitle">Web V1 • ICS Styled</span>
+          </div>
+
+          <div className="nav-center">
+            <input
+              className="nav-search"
+              placeholder="Search notes..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+
+          <div className="nav-right">
+            <button
+              className="nav-link-btn"
+              onClick={() => {
+                setShowHome(true);
+                setShowStats(false);
+              }}
+            >
+              Home
+            </button>
+
+            <button
+              className="nav-link-btn"
+              onClick={() => {
+                setShowHome(false);
+                setShowStats(false);
+              }}
+            >
+              Notes
+            </button>
+
+            <button
+              className="nav-link-btn"
+              onClick={() => {
+                setShowHome(false);
+                setShowStats(true);
+              }}
+            >
+              Stats
+            </button>
+          </div>
+        </div>
 
       {/* HOME PAGE */}
       {showHome && !showStats && (
