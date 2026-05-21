@@ -175,34 +175,18 @@ useEffect(() => {
     )
   );
 
-  const noteRef = doc(db, "notes", selectedNoteId);
-  await updateDoc(noteRef, {
-    ...fields,
-    updatedAt: Date.now()
-  });
+ const noteRef = doc(db, "notes", selectedNoteId);
+await updateDoc(noteRef, {
+  ...fields,
+  updatedAt: Date.now()
+});
+
+setNotes((prev) =>
+  prev.map((n) =>
+    n.id === selectedNoteId ? { ...n, ...fields, updatedAt: Date.now() } : n
+  )
+);
 }
-
-    setNotes((prev) =>
-      prev.map((n) =>
-        n.id === selectedNoteId ? { ...n, ...fields, updatedAt: Date.now() } : n
-      )
-    );
-  }
-
-  async function deleteNote(id: string) {
-  setNotes((prev) =>
-    prev.map((n) => (n.id === id ? { ...n, deleted: true } : n))
-  );
-
-  const noteRef = doc(db, "notes", id);
-  await updateDoc(noteRef, { deleted: true });
-}
-
-  function restoreNote(id: string) {
-    setNotes((prev) =>
-      prev.map((n) => (n.id === id ? { ...n, deleted: false } : n))
-    );
-  }
 
   async function deleteForever(id: string) {
   setNotes((prev) => prev.filter((n) => n.id !== id));
