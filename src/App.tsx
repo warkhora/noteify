@@ -146,26 +146,6 @@ useEffect(() => {
   });
 }
 
-    const targetFolder =
-      currentFolder === 'all' || currentFolder === 'trash'
-        ? 'personal'
-        : currentFolder;
-
-    const newNote: Note = {
-      id,
-      title: 'Untitled Note',
-      content: '',
-      folder: targetFolder,
-      deleted: false,
-      createdAt: now,
-      updatedAt: now,
-    };
-
-    setNotes([newNote, ...notes]);
-    setSelectedNoteId(id);
-    setShowHome(false);
-  }
-
   async function updateNote(fields: Partial<Note>) {
   if (!selectedNoteId) return;
 
@@ -175,17 +155,11 @@ useEffect(() => {
     )
   );
 
- const noteRef = doc(db, "notes", selectedNoteId);
-await updateDoc(noteRef, {
-  ...fields,
-  updatedAt: Date.now()
-});
-
-setNotes((prev) =>
-  prev.map((n) =>
-    n.id === selectedNoteId ? { ...n, ...fields, updatedAt: Date.now() } : n
-  )
-);
+  const noteRef = doc(db, "notes", selectedNoteId);
+  await updateDoc(noteRef, {
+    ...fields,
+    updatedAt: Date.now()
+  });
 }
 
   async function deleteForever(id: string) {
@@ -194,6 +168,18 @@ setNotes((prev) =>
   const noteRef = doc(db, "notes", id);
   await deleteDoc(noteRef);
 }
+
+  function deleteNote(id: string) {
+    setNotes((prev) =>
+      prev.map((n) => (n.id === id ? { ...n, deleted: true } : n))
+    );
+  }
+
+  function restoreNote(id: string) {
+    setNotes((prev) =>
+      prev.map((n) => (n.id === id ? { ...n, deleted: false } : n))
+    );
+  }
 
   function startRenameFolder() {
     if (SYSTEM_FOLDERS.includes(currentFolder)) return;
@@ -600,6 +586,8 @@ setNotes((prev) =>
           </div>
         </div>
       )}
+      </>
+    )}
     </div>
   );
 }
