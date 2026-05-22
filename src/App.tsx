@@ -309,8 +309,8 @@ useEffect(() => {
       </div>
     </div>
 
-    {/* HOME PAGE */}
-    {showHome && !showStats && (
+        {/* HOME PAGE */}
+    {showHome && !showStats && !showProfile && (
       <div className="frame fade-in">
         <h1 className="title">NOTEIFY V1</h1>
         <p className="subtitle">A redesigned note‑taking experience</p>
@@ -326,7 +326,7 @@ useEffect(() => {
     )}
 
     {/* MAIN APP */}
-    {!showHome && !showStats && (
+    {!showHome && !showStats && !showProfile && (
       <div
         className="frame fade-in"
         style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}
