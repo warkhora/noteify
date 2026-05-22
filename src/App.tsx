@@ -5,6 +5,7 @@ import { useAuthState } from "react-firebase-hooks/auth";
 import Login from "./Login";
 import ProfileFrame from "./ProfileFrame";
 import { db } from "./firebase";
+const [showAI, setShowAI] = useState(false);
 import { 
   collection, 
   addDoc, 
@@ -260,6 +261,7 @@ useEffect(() => {
             setShowHome(true);
             setShowStats(false);
             setShowProfile(false);
+            setShowAI(false);
           }}
         >
           Home
@@ -271,6 +273,7 @@ useEffect(() => {
             setShowHome(false);
             setShowStats(false);
             setShowProfile(false);
+            setShowAI(false);
           }}
         >
           Notes
@@ -282,6 +285,7 @@ useEffect(() => {
             setShowHome(false);
             setShowStats(true);
             setShowProfile(false);
+            setShowAI(false);
           }}
         >
           Stats
@@ -293,11 +297,23 @@ useEffect(() => {
             setShowHome(false);
             setShowStats(false);
             setShowProfile(true);
+            setShowAI(false);
           }}
         >
           Profile
         </button>
 
+        <button
+          className="nav-link-btn"
+          onClick={() => {
+            setShowHome(false);
+            setShowStats(false);
+            setShowProfile(false);
+            setShowAI(true);
+          }}
+        >
+          Noteify AI
+        </button>
 
         <button
           className="nav-link-btn"
@@ -324,6 +340,12 @@ useEffect(() => {
     {showProfile && (
       <ProfileFrame user={user} notes={notes} />
     )}
+
+    {/* AI PAGE */}
+    {showAI && (
+      <Aiframe askGroq={askGroq} />
+    )}
+
 
     {/* MAIN APP */}
     {!showHome && !showStats && !showProfile && (
