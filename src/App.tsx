@@ -7,7 +7,6 @@ import { useAuthState } from "react-firebase-hooks/auth";
 import Login from "./Login";
 import ProfileFrame from "./ProfileFrame";
 import { db } from "./firebase";
-const [showAI, setShowAI] = useState(false);
 import { 
   collection, 
   addDoc, 
