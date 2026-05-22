@@ -7,7 +7,7 @@ export default function ProfileFrame({ user, notes }) {
 
   return (
     <div className="frame fade-in" style={{ maxWidth: "600px", margin: "0 auto" }}>
-      <h1 className="title">Your Profile</h1>
+      <h1 className="title">Profile</h1>
 
       <div style={{ textAlign: "center", marginBottom: "20px" }}>
         <img
