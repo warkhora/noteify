@@ -258,6 +258,7 @@ useEffect(() => {
           onClick={() => {
             setShowHome(true);
             setShowStats(false);
+            setShowProfile(false);
           }}
         >
           Home
@@ -268,6 +269,7 @@ useEffect(() => {
           onClick={() => {
             setShowHome(false);
             setShowStats(false);
+            setShowProfile(false);
           }}
         >
           Notes
@@ -278,6 +280,7 @@ useEffect(() => {
           onClick={() => {
             setShowHome(false);
             setShowStats(true);
+            setShowProfile(false);
           }}
         >
           Stats
