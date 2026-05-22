@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import './index.css';
+import Aiframe from "./Aiframe";
+import { askGroq } from "./ai";
 import { auth } from "./firebase";
 import { useAuthState } from "react-firebase-hooks/auth";
 import Login from "./Login";
@@ -345,7 +347,6 @@ useEffect(() => {
     {showAI && (
       <Aiframe askGroq={askGroq} />
     )}
-
 
     {/* MAIN APP */}
     {!showHome && !showStats && !showProfile && (
