@@ -31,6 +31,7 @@ export default function App() {
   const [user] = useAuthState(auth);
   const [showHome, setShowHome] = useState(true);
   const [showStats, setShowStats] = useState(false);
+  const [showProfile, setShowProfile] = useState(false);
 
   const [notes, setNotes] = useState<Note[]>([]);
   const [selectedNoteId, setSelectedNoteId] = useState<string | null>(null);
@@ -284,6 +285,18 @@ useEffect(() => {
 
         <button
           className="nav-link-btn"
+          onClick={() => {
+            setShowHome(false);
+            setShowStats(false);
+            setShowProfile(true);
+          }}
+        >
+          Profile
+        </button>
+
+
+        <button
+          className="nav-link-btn"
           onClick={() => auth.signOut()}
           style={{ marginLeft: "10px", color: "#ff6b6b" }}
         >
@@ -301,6 +314,11 @@ useEffect(() => {
         <button onClick={() => setShowHome(false)}>📒 Open Noteify</button>
         <button onClick={() => setShowStats(true)}>📊 View Stats</button>
       </div>
+    )}
+
+    {/* PROFILE PAGE */}
+    {showProfile && (
+      <ProfileFrame user={user} notes={notes} />
     )}
 
     {/* MAIN APP */}
