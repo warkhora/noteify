@@ -8,6 +8,17 @@ import Login from "./Login";
 import ProfileFrame from "./ProfileFrame";
 import { db } from "./firebase";
 const [showAI, setShowAI] = useState(false);
+import ChatUI from "./components/ChatUI";
+
+function App() {
+  return (
+    <div>
+      <ChatUI />
+    </div>
+  );
+}
+
+export default App;
 import { 
   collection, 
   addDoc, 
