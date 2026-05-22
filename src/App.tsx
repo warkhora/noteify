@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import './index.css';
+import { useState, useEffect } from "react";
+import "./index.css";
 import Aiframe from "./Aiframe";
 import { askGroq } from "./ai";
 import { auth } from "./firebase";
@@ -8,17 +8,6 @@ import Login from "./Login";
 import ProfileFrame from "./ProfileFrame";
 import { db } from "./firebase";
 const [showAI, setShowAI] = useState(false);
-import ChatUI from "./components/ChatUI";
-
-function App() {
-  return (
-    <div>
-      <ChatUI />
-    </div>
-  );
-}
-
-export default App;
 import { 
   collection, 
   addDoc, 
@@ -30,6 +19,7 @@ import {
   where 
 } from "firebase/firestore";
 
+// ---------- MUST BE OUTSIDE THE COMPONENT ----------
 interface Note {
   id: string;
   title: string;
@@ -40,26 +30,28 @@ interface Note {
   updatedAt: number;
 }
 
-const SYSTEM_FOLDERS = ['all', 'personal', 'work', 'trash'];
+const SYSTEM_FOLDERS = ["all", "personal", "work", "trash"];
+// ----------------------------------------------------
 
 export default function App() {
   const [user] = useAuthState(auth);
   const [showHome, setShowHome] = useState(true);
   const [showStats, setShowStats] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
+  const [showAI, setShowAI] = useState(false);
 
   const [notes, setNotes] = useState<Note[]>([]);
   const [selectedNoteId, setSelectedNoteId] = useState<string | null>(null);
 
-  const [currentFolder, setCurrentFolder] = useState('all');
+  const [currentFolder, setCurrentFolder] = useState("all");
   const [customFolders, setCustomFolders] = useState<string[]>([]);
   const [creatingFolder, setCreatingFolder] = useState(false);
-  const [newFolderName, setNewFolderName] = useState('');
+  const [newFolderName, setNewFolderName] = useState("");
 
   const [renamingFolder, setRenamingFolder] = useState(false);
-  const [renameValue, setRenameValue] = useState('');
+  const [renameValue, setRenameValue] = useState("");
 
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
 
   // Load saved data
   useEffect(() => {
