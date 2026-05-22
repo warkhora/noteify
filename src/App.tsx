@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import "./index.css";
-import Aiframe from "./Aiframe";
 import { askGroq } from "./ai";
 import { auth } from "./firebase";
 import { useAuthState } from "react-firebase-hooks/auth";
@@ -17,6 +16,7 @@ import {
   query, 
   where 
 } from "firebase/firestore";
+import NoteifyAI from "./NoteifyAI";
 
 // ---------- MUST BE OUTSIDE THE COMPONENT ----------
 interface Note {
@@ -347,7 +347,7 @@ useEffect(() => {
 
     {/* AI PAGE */}
     {showAI && (
-      <Aiframe askGroq={askGroq} />
+      <NoteifyAI />
     )}
 
     {/* MAIN APP */}
